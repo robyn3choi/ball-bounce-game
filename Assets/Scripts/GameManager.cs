@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
@@ -46,18 +47,21 @@ public class GameManager : MonoBehaviour {
             gameOverText.gameObject.SetActive(true);
             lostScoreText.gameObject.SetActive(true);
             restartBtn.gameObject.SetActive(true);
+            lost = true;
         }
     }
 
     public void Restart() {
-        gameOverText.gameObject.SetActive(false);
-        lostScoreText.gameObject.SetActive(false);
-        restartBtn.gameObject.SetActive(false);
-        score = 0;
-        scoreText.text = "0";
-        bool lost = false;
-        Camera.main.transform.position = new Vector3(0, 1, -10);
-        ball.Restart();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+//        gameOverText.gameObject.SetActive(false);
+//        lostScoreText.gameObject.SetActive(false);
+//        restartBtn.gameObject.SetActive(false);
+//        score = 0;
+//        scoreText.text = "0";
+//        lost = false;
+//        Camera.main.transform.position = new Vector3(0, 1, -10);
+//        ball.Restart();
         // generate level
     }
 }

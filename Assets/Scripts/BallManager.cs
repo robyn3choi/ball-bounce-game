@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour {
+public class BallManager : MonoBehaviour {
 
-    public static AudioManager inst = null;
-    public List<AudioClip> notes;
-    public List<AudioClip> lowNotes;
-    public List<AudioClip> collectibles;
+    public static BallManager inst = null;
+    List<Ball> balls;
 
     void Awake()
     {
@@ -21,9 +19,10 @@ public class AudioManager : MonoBehaviour {
         }
     }
 
-    // Use this for initialization
-    void Start () {
-		
+	// Use this for initialization
+	void Start () {
+        balls = new List<Ball>();
+
 	}
 	
 	// Update is called once per frame

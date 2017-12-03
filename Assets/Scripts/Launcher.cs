@@ -6,21 +6,22 @@ public class Launcher : MonoBehaviour {
 
     Vector2 offset;
     Vector2 origin;
-    Rigidbody ballRB;
+    Rigidbody mainBall;
     float speed = 0.05f;
 
-    Transform arrow;
+    SpriteRenderer arrow;
     float arrowScaleFactor = 0.005f;
+
+    public List<Rigidbody> balls;
 
 	// Use this for initialization
 	void Start () {
-        ballRB = GetComponent<Rigidbody>();
-        ballRB.interpolation = RigidbodyInterpolation.Interpolate;
+
         origin = new Vector2(999, 999);
         offset = Vector2.zero;
 
-        arrow = GameObject.Find("arrow").transform;
-        arrow.gameObject.SetActive(false);
+        arrow = GetComponent<SpriteRenderer>();
+        arrow.color = new Color(1, 1, 1, 0);
 	}
 
     // Update is called once per frame
@@ -43,18 +44,18 @@ public class Launcher : MonoBehaviour {
         if (Input.GetMouseButton(0) && origin.x == 999)
         {
             origin = Input.mousePosition;
-            arrow.gameObject.SetActive(true);
-            arrow.localScale = new Vector3(arrow.localScale.x, 0, 1);
+            arrow.color = new Color(1, 1, 1, 1);
+            transform.localScale = new Vector3(transform.localScale.x, 0, 1);
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
             {
-                arrow.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z);
             }
         }
         else if (Input.GetMouseButton(0))
         {
             offset = new Vector2(Input.mousePosition.x, Input.mousePosition.y) - origin;
-            arrow.localScale = new Vector3(arrow.localScale.x, offset.magnitude * arrowScaleFactor, 1);
+            transform.localScale = new Vector3(transform.localScale.x, offset.magnitude * arrowScaleFactor, 1);
             // find angle between offset and down vector
             float angle;
             Vector2 down = new Vector2(0, -1);
@@ -63,16 +64,17 @@ public class Launcher : MonoBehaviour {
             {
                 angle = -angle;
             }
-            arrow.eulerAngles = new Vector3(0, 0, -angle);
+            transform.eulerAngles = new Vector3(0, 0, -angle);
         }
         else if (!Input.GetMouseButton(0) && offset.magnitude > 0)
         {
-            ballRB.velocity = -offset * speed;
-            //ballRB.AddForce(offset);
+            foreach (Rigidbody ball in balls) {
+                ball.velocity = -offset * speed;
+            }
             offset = Vector2.zero;
             origin = new Vector2(999, 999);
-            arrow.gameObject.SetActive(false);
-            arrow.localScale = new Vector3(arrow.localScale.x, 0, 1);
+            arrow.color = new Color(1, 1, 1, 0);
+            transform.localScale = new Vector3(transform.localScale.x, 0, 1);
         }
     }
 }

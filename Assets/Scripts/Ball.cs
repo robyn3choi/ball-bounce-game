@@ -4,42 +4,50 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour {
 
-    ParticleSystem wallParticles;
+    protected ParticleSystem wallParticles;
     ParticleSystem cubeParticles;
     public AudioClip[] scoreSounds;
-    AudioSource aud;
+    protected AudioSource aud;
     int scoreSoundIndex = 0;
     Vector3 startPos = new Vector3(0, -0.5f, -4.78f);
-    Rigidbody rb;
+    protected Rigidbody rb;
+    protected Launcher launcher;
 
     // Use this for initialization
-    void Start () {
-        wallParticles = GameObject.Find("WallParticles").GetComponent<ParticleSystem>();
+    protected void Start () {
+        wallParticles = transform.GetChild(0).GetComponent<ParticleSystem>();
         cubeParticles = GameObject.Find("CubeParticles").GetComponent<ParticleSystem>();
         aud = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        launcher = GameObject.Find("Launcher").GetComponent<Launcher>();
+        // if this is not a ballcopy
+        if (GetComponent<BallCopy>() == null)
+            launcher.balls.Add(rb);
     }
 
-    private void Update()
+    protected void OnCollisionEnter(Collision collision)
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            aud.Play();
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
+        GameObject other = collision.gameObject;
         // play particles at wall when ball bounces off that point
-        if (collision.gameObject.CompareTag("Wall"))
+        if (other.CompareTag("Wall"))
         {
             Vector3 hitPoint = collision.contacts[0].point;
             wallParticles.transform.position = hitPoint;
             wallParticles.Play();
         }
+        else if (other.CompareTag("Ball")) {
+            BallCopy ballCopy = other.GetComponent<BallCopy>();
+            if (ballCopy != null) {
+                if (!ballCopy.unlocked) {
+                    aud.clip = AudioManager.inst.collectibles[0];
+                    aud.Play();
+                    ballCopy.Unlock();
+                }   
+            }
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Cube"))
         {
@@ -47,28 +55,20 @@ public class Ball : MonoBehaviour {
             cubeParticles.transform.position = other.transform.position;
             cubeParticles.Play();
             other.transform.parent.gameObject.SetActive(false);
-            aud.clip = scoreSounds[scoreSoundIndex];
-            if (scoreSoundIndex == scoreSounds.Length)
-            {
-                scoreSoundIndex = 0;
-            }
-            else
-            {
-                scoreSoundIndex++;
-            }
+            aud.clip = AudioManager.inst.collectibles[1];
             aud.Play();
         }
+
         else if (other.CompareTag("ScreenBottom")) {
             rb.useGravity = false;
             rb.velocity = Vector3.zero;
-            GameManager.inst.Lose();
+            if (GetComponent<BallCopy>() == null)
+                GameManager.inst.Lose();
         }
     }
 
-    public void Restart() {
+    public virtual void Restart() {
         transform.position = startPos;
         rb.useGravity = true;
     }
-
-    
 }

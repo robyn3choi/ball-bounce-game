@@ -9,14 +9,13 @@ public class Wall : MonoBehaviour {
     float lerp = 0;
     public bool lowNotes = false;
     AudioSource audiosource;
-    TrailRenderer ballTrail;
 
 	// Use this for initialization
 	void Start () {
         mat = GetComponent<MeshRenderer>().material;
         audiosource = GetComponent<AudioSource>();
 
-        ballTrail = GameObject.Find("Ball").GetComponent<TrailRenderer>();
+        //ballTrail = GameObject.Find("Ball").GetComponent<TrailRenderer>();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -30,7 +29,8 @@ public class Wall : MonoBehaviour {
             otherColor = mat.color;
             lerp = 0;
             StartCoroutine("FadeToDefault");
-            ChangeBallTrailColor(WallColors.colors[index]);
+            TrailRenderer ballTrail = collision.gameObject.GetComponent<TrailRenderer>();
+            ChangeBallTrailColor(ballTrail, WallColors.colors[index]);
 
             AudioClip note;
             if (lowNotes)
@@ -59,7 +59,7 @@ public class Wall : MonoBehaviour {
         yield break;
     }
 
-    void ChangeBallTrailColor(Color32 color) {
+    void ChangeBallTrailColor(TrailRenderer ballTrail, Color32 color) {
         Color trailColor;
         if (color.Equals(WallColors.red)) { trailColor = Color.red; }
         else if (color.Equals(WallColors.yellow)) { trailColor = Color.yellow; }
@@ -70,6 +70,5 @@ public class Wall : MonoBehaviour {
 
         ballTrail.endColor = trailColor;
         ballTrail.startColor = trailColor;
-        print(ballTrail.startColor);
     }
 }
