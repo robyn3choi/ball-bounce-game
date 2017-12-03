@@ -9,12 +9,15 @@ public class Ball : MonoBehaviour {
     public AudioClip[] scoreSounds;
     AudioSource aud;
     int scoreSoundIndex = 0;
+    Vector3 startPos = new Vector3(0, -0.5f, -4.78f);
+    Rigidbody rb;
 
     // Use this for initialization
     void Start () {
         wallParticles = GameObject.Find("WallParticles").GetComponent<ParticleSystem>();
         cubeParticles = GameObject.Find("CubeParticles").GetComponent<ParticleSystem>();
         aud = GetComponent<AudioSource>();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
@@ -55,6 +58,17 @@ public class Ball : MonoBehaviour {
             }
             aud.Play();
         }
+        else if (other.CompareTag("ScreenBottom")) {
+            rb.useGravity = false;
+            rb.velocity = Vector3.zero;
+            GameManager.inst.Lose();
+        }
     }
+
+    public void Restart() {
+        transform.position = startPos;
+        rb.useGravity = true;
+    }
+
     
 }

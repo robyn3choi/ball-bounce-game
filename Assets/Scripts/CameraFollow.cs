@@ -16,9 +16,9 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	void Update () {
-        if (ball.position.y > (transform.position.y + changeOffset) || ball.position.y < (transform.position.y - changeOffset)) 
+        //if (ball.position.y > (transform.position.y + changeOffset) || ball.position.y < (transform.position.y - changeOffset)) 
+        if (ball.position.y > (transform.position.y + changeOffset))
         {
-            print(ball.position.y - transform.position.y);
             Vector3 newPosition = new Vector3(transform.position.x, ball.position.y + offset, transform.position.z);
             //transform.position = Vector3.Lerp(transform.position, newPosition, smoothSpeed * Time.deltaTime);
             //transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref currentVelocity, smoothSpeed);

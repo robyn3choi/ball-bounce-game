@@ -7,6 +7,7 @@ TagManager:
   - Ball
   - Wall
   - Cube
+  - ScreenBottom
   layers:
   - Default
   - TransparentFX

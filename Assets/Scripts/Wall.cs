@@ -4,41 +4,20 @@ using UnityEngine;
 
 public class Wall : MonoBehaviour {
 
-    List<Color32> colors;
-    Color32 defaultColor;
     Material mat;
     Color otherColor;
     float lerp = 0;
     public bool lowNotes = false;
-    AudioSource audio;
-    //TrailRenderer ballTrail;
+    AudioSource audiosource;
+    TrailRenderer ballTrail;
 
 	// Use this for initialization
 	void Start () {
-        defaultColor = new Color32(171, 171, 171, 255);
-        Color32 red = new Color32(255, 118, 118, 255);
-        Color32 yellow = new Color32(255, 255, 118, 255);
-        Color32 green = new Color32(118, 255, 118, 255);
-        Color32 blue = new Color32(118, 118, 255, 255);
-        Color32 pink = new Color32(255, 118, 255, 255);
-
-        colors = new List<Color32>();
-        colors.Add(red);
-        colors.Add(yellow);
-        colors.Add(green);
-        colors.Add(blue);
-        colors.Add(pink);
-
         mat = GetComponent<MeshRenderer>().material;
-        audio = GetComponent<AudioSource>();
+        audiosource = GetComponent<AudioSource>();
 
-        //ballTrail = GameObject.Find("Ball").GetComponent<TrailRenderer>();
+        ballTrail = GameObject.Find("Ball").GetComponent<TrailRenderer>();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -46,11 +25,12 @@ public class Wall : MonoBehaviour {
         if (collision.gameObject.CompareTag("Ball"))
         {
             StopAllCoroutines();
-            int index = Random.Range(0, colors.Count);
-            mat.color = colors[index];
+            int index = Random.Range(0, WallColors.colors.Count);
+            mat.color = WallColors.colors[index];
             otherColor = mat.color;
             lerp = 0;
-            StartCoroutine("fadeToDefault");
+            StartCoroutine("FadeToDefault");
+            ChangeBallTrailColor(WallColors.colors[index]);
 
             AudioClip note;
             if (lowNotes)
@@ -63,18 +43,33 @@ public class Wall : MonoBehaviour {
                 index = Random.Range(0, AudioManager.inst.notes.Count);
                 note = AudioManager.inst.notes[index];
             }
-            audio.clip = note;
-            audio.Play();
+            audiosource.clip = note;
+            audiosource.Play();
+
         }
     }
 
-    IEnumerator fadeToDefault()
+    IEnumerator FadeToDefault()
     {
-        while (mat.color != defaultColor)
+        while (mat.color != WallColors.defaultColor)
         {
-            mat.color = Color.Lerp(otherColor, defaultColor, lerp += Time.deltaTime);
+            mat.color = Color.Lerp(otherColor, WallColors.defaultColor, lerp += Time.deltaTime);
             yield return null;
         }
         yield break;
+    }
+
+    void ChangeBallTrailColor(Color32 color) {
+        Color trailColor;
+        if (color.Equals(WallColors.red)) { trailColor = Color.red; }
+        else if (color.Equals(WallColors.yellow)) { trailColor = Color.yellow; }
+        else if (color.Equals(WallColors.green)) { trailColor = Color.green; }
+        else if (color.Equals(WallColors.blue)) { trailColor = new Color(0, 0.15f, 1, 1); }
+        else if (color.Equals(WallColors.pink)) { trailColor = Color.magenta; }
+        else { trailColor = WallColors.defaultColor; }
+
+        ballTrail.endColor = trailColor;
+        ballTrail.startColor = trailColor;
+        print(ballTrail.startColor);
     }
 }
